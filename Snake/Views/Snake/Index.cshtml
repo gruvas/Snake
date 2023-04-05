@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["Title"] = "Snake";
+}
+
+<div class="text-center">
+    <h2 class="game-title">
+        Ход игрока 1
+    </h2>
+
+    <div class="mb-4">
+        <div class="d-flex justify-content-center">
+            <p class="fs-4">
+                Количество ходов:&nbsp;
+            </p>
+
+            <p class="fs-4" id="numberMoves">0</p>
+        </div>
+    </div>
+
+    <div class="snake-container">
+        @for (int row = 0; row < 5; row++)
+        {
+            <div class="d-flex">
+                @for (int col = 0; col < 5; col++)
+                {
+                    var dotId = "dot" + row + col;
+                    var lineHorizontalId = "line-horizontal" + row + col;
+
+                    if (col < 4)
+                    {
+                        <img class="col dot" id=@dotId src="~/img/dot.svg" alt="•" />
+                        <div class="line-horizontal" id=@lineHorizontalId></div>
+                    }
+                    else
+                    {
+                        <img class="col dot" id=@dotId src="~/img/dot.svg" alt="•" />
+                    }
+                }
+            </div>
+
+            if(row < 4)
+            {
+                <div class="container-line_vertical">
+                    @for (int col = 0; col < 5; col++)
+                    {
+                        var lineVerticalId = "line-vertical" + row + col;
+
+                        <div class="line-vertical" id=@lineVerticalId></div>
+                    }
+                </div>
+            }
+        }
+    </div>
+
+    <button class="btn btn-primary mt-5">
+        Сбросить
+    </button>
+
+    <canvas id="canvas" style="display: block"></canvas>
+</div>
