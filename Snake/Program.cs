@@ -1,7 +1,20 @@
+using Snake.PostgresMigrate;
+using Snake.DAL.Repositories;
+using Snake.DAL.Interface;
+using Microsoft.AspNetCore.SignalR;
+using Snake.Hubs;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+
+string connectionString = builder.Configuration["ConnectionString:NpgsqlConnectionString"];
+PostgresMigrator.Migrate(connectionString);
+builder.Services.AddScoped<ISnakeRepository, SnakeRepository>(x => new SnakeRepository(connectionString));
+
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -17,6 +30,10 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.MapHub<NotificationHub>("/hubs");
+
+app.MapControllers();
 
 app.UseAuthorization();
 

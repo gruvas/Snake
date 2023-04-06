@@ -1,96 +1,262 @@
 ﻿import lineColoring from '/js/components/LineColoring.js'
+import createSnake from '/js/components/createSnake.js'
 
 const dots = document.querySelectorAll('.dot');
 const gameTitle = document.querySelector('.game-title');
 let arr = []
-let userNumber = 1
-let element1, element2
-let numberMoves = 0
+let playerNumber = 1
+let firstField, lastField
+let moveNumber = 0
 let startSelected = false
 let gameOver = false
+let wrongFieldsSelected = false
 
 // startId indicates where the game started from
 // endId indicates which last field was selected
-let startId, endId
+let start, end
 
 
-dots.forEach(dot => {
-    dot.addEventListener('click', function () {
-        if (gameOver) {
-            alert("Игра завершена. Нажмите на кнопку сбросить чтобы начать сначала.")
-            return;
-        }
 
-        if (element1 == undefined) {
 
-            if (this.id != startId && this.id != endId && numberMoves > 0) {
-                alert("Выбранный вами элемент не является началом или концом змеи. Пожалуйста, выберите другое поле.")
+main()
+
+
+
+async function main() {
+
+    let connection = new signalR.HubConnectionBuilder()
+        .withUrl("/hubs")
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
+
+    if (localStorage.getItem('SnakeId')) {
+        await connection.start().then(async function () {
+            const found = await connection.invoke("CheckSnakeExists", parseInt(localStorage.getItem('SnakeId')));
+
+            if (!found) {
+                localStorage.removeItem('SnakeId');
+                return;
+            }
+        }).catch(function (err) {
+            console.error(err.toString());
+        }).finally(async () => {
+            if (connection._connectionState === signalR.HubConnectionState.Connected) {
+                await connection.stop()
+            }
+        })
+    }
+
+    if (!localStorage.getItem('SnakeId')) {
+        await connection.start().then(async function () {
+            const snakeId = await connection.invoke("CreateSnake");
+            localStorage.setItem('SnakeId', snakeId);
+        }).catch(function (err) {
+            console.error(err.toString());
+        }).finally(async () => {
+            if (connection._connectionState === signalR.HubConnectionState.Connected) {
+                await connection.stop()
+            }
+        })
+    }
+
+
+
+
+
+
+    dots.forEach(dot => {
+        dot.addEventListener('click', async function () {
+            if (gameOver) {
+                alert("Игра завершена. Нажмите на кнопку сбросить чтобы начать сначала.")
                 return;
             }
 
-            if (this.id == startId && numberMoves > 0) {
-                startSelected = true
-            }
 
-            element1 = this
+            if (firstField == undefined) {
 
-            this.setAttribute('src', "/img/dot_red.svg")
-        } else {
-            const id = this.id;
-            element2 = this
-
-            if (arr.includes(id)) {
-                gameOver = true
-                alert(`Победу одержал ${userNumber} игрок`)
-                gameTitle.textContent = `Победу одержал ${userNumber} игрок`
-                return false
-            }
-
-            if (element1 == element2) {
-                element1 = undefined
-                element2 = undefined
-                element2.setAttribute('src', "/img/dot.svg")
-                return;
-            }
-
-            lineColoring(element1, element2, userNumber)
-
-            if (userNumber == 1) {
-                element2.setAttribute('src', "/img/dot_green.svg")
-
-                if (numberMoves != 0) {
-                    element1.setAttribute('src', "/img/dot_blue.svg")
-                } else {
-                    arr.push(element1.id)
-                    startId = element1.id
-                    element1.setAttribute('src', "/img/dot_green.svg")
+                if (this.id != start && this.id != end && moveNumber > 0) {
+                    alert("Выбранный вами элемент не является началом или концом змеи. Пожалуйста, выберите другое поле.")
+                    return;
                 }
 
-                userNumber = 2
-                gameTitle.textContent = `Ход игрока ${userNumber}`
+                if (this.id == start && moveNumber > 0) {
+                    startSelected = true
+                }
 
+                firstField = this
+
+                this.setAttribute('src', "/img/dot_red.svg")
             } else {
-                element2.setAttribute('src', "/img/dot_blue.svg")
-                element1.setAttribute('src', "/img/dot_green.svg")
+                const id = this.id;
+                lastField = this
 
-                userNumber = 1
-                gameTitle.textContent = `Ход игрока ${userNumber}`
+                if (firstField == lastField) {
+                    lastField.setAttribute('src', "/img/dot.svg")
+                    firstField = undefined
+                    lastField = undefined
+                    return;
+                }
+
+
+
+                await connection.start().then(async function () {
+                    const snakeGameId = parseInt(localStorage.getItem('SnakeId'));
+                    let [lastFd] = lastField.id.match(/\d+/)
+                    lastFd = parseInt(lastFd)
+
+                    console.log(gameOver)
+
+                    let valid = await connection.invoke("FieldValidation", snakeGameId, lastFd);
+                    gameOver = !valid
+
+                    console.log(valid)
+                    console.log(gameOver)
+
+
+                    if (gameOver) {
+                        let winner
+
+                        if (playerNumber == 1) {
+                            winner = 2
+                        } else {
+                            winner = 1
+                        }
+
+                        await connection.invoke("EndGame", snakeGameId, winner);
+
+                        alert(`Победу одержал ${winner} игрок`)
+                        gameTitle.textContent = `Победу одержал ${winner} игрок`
+                    }
+
+
+                    return false
+
+                }).catch(function (err) {
+                    console.error(err.toString());
+                }).finally(async () => {
+                    if (connection._connectionState === signalR.HubConnectionState.Connected) {
+                        await connection.stop()
+                    }
+                })
+
+
+                let [firstFd] = firstField.id.match(/\d+/)
+                let [lastFd] = lastField.id.match(/\d+/)
+                firstFd = parseInt(firstFd)
+                lastFd = parseInt(lastFd)
+
+
+                
+                await connection.start().then(async function () {
+                    const snakeGameId = parseInt(localStorage.getItem('SnakeId'));
+
+                    await connection.invoke("AddMove", snakeGameId, playerNumber, firstFd, lastFd, moveNumber + 1);
+
+                }).catch(function (err) {
+                    console.error(err.toString());
+                }).finally(async () => {
+                    if (connection._connectionState === signalR.HubConnectionState.Connected) {
+                        await connection.stop()
+                    }
+                })
+
+
+                lineColoring(firstField, lastField, playerNumber)
+
+                if (playerNumber == 1) {
+                    lastField.setAttribute('src', "/img/dot_green.svg")
+
+                    if (moveNumber != 0) {
+                        firstField.setAttribute('src', "/img/dot_blue.svg")
+                    } else {
+                        arr.push(firstField.id)
+                        start = firstField.id
+                        firstField.setAttribute('src', "/img/dot_green.svg")
+
+                        await connection.start().then(async function () {
+                            const snakeGameId = parseInt(localStorage.getItem('SnakeId'));
+
+                            await connection.invoke("ChangeStart", snakeGameId, firstFd);
+
+                        }).catch(function (err) {
+                            console.error(err.toString());
+                        }).finally(async () => {
+                            if (connection._connectionState === signalR.HubConnectionState.Connected) {
+                                await connection.stop()
+                            }
+                        })
+                    }
+
+                    playerNumber = 2
+                    gameTitle.textContent = `Ход игрока ${playerNumber}`
+
+                } else {
+                    lastField.setAttribute('src', "/img/dot_blue.svg")
+                    firstField.setAttribute('src', "/img/dot_green.svg")
+
+                    playerNumber = 1
+                    gameTitle.textContent = `Ход игрока ${playerNumber}`
+                }
+
+                arr.push(id)
+
+                if (startSelected) {
+                    start = lastField.id
+                    startSelected = false
+
+                    await connection.start().then(async function () {
+                        const snakeGameId = parseInt(localStorage.getItem('SnakeId'));
+
+                        await connection.invoke("ChangeStart", snakeGameId, lastFd);
+
+                    }).catch(function (err) {
+                        console.error(err.toString());
+                    }).finally(async () => {
+                        if (connection._connectionState === signalR.HubConnectionState.Connected) {
+                            await connection.stop()
+                        }
+                    })
+                } else {
+                    end = lastField.id
+
+                    await connection.start().then(async function () {
+                        const snakeGameId = parseInt(localStorage.getItem('SnakeId'));
+
+                        await connection.invoke("ChangeEnd", snakeGameId, lastFd);
+
+                    }).catch(function (err) {
+                        console.error(err.toString());
+                    }).finally(async () => {
+                        if (connection._connectionState === signalR.HubConnectionState.Connected) {
+                            await connection.stop()
+                        }
+                    })
+                }
+
+                firstField = undefined
+                lastField = undefined
+                moveNumber++
+
+                document.querySelector('#numberMoves').textContent = moveNumber
             }
-
-            arr.push(id)
-
-            if (startSelected) {
-                startId = element2.id
-                startSelected = false
-            } else {
-                endId = element2.id
-            }
-
-            element1 = undefined
-            element2 = undefined
-            numberMoves++
-
-            document.querySelector('#numberMoves').textContent = numberMoves
-        }
+        });
     });
-});
+
+    document.querySelector('#reset').addEventListener('click', async function () {
+        await connection.start().then(async function () {
+            const snakeGameId = parseInt(localStorage.getItem('SnakeId'));
+
+            await connection.invoke("RemoveSnake", snakeGameId);
+
+        }).catch(function (err) {
+            console.error(err.toString());
+        }).finally(async () => {
+            if (connection._connectionState === signalR.HubConnectionState.Connected) {
+                await connection.stop()
+            }
+
+            localStorage.removeItem('SnakeId');
+            location.reload();
+        })
+    })
+}

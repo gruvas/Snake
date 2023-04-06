@@ -4,10 +4,20 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>e791cf50-7812-43a4-8215-eb8f5c98ed72</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="wwwroot\img\dot.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Snake.DAL\Snake.DAL.csproj" />
+    <ProjectReference Include="..\Snake.PostgresMigrate\Snake.PostgresMigrate.csproj" />
   </ItemGroup>
 
 </Project>
