@@ -3,6 +3,7 @@ import lineColoring from '/js/components/Snake/LineColoring.js'
 import addMove from '/js/SignaIR/Snake/AddMove.js'
 import changeStartEnd from '/js/SignaIR/Snake/ChangeStartEnd.js'
 import fieldValidation from '/js/SignaIR/Snake/FieldValidation.js'
+import getDataForDot from '/js/SignaIR/Snake/getDataForDot.js'
 
 let playerNumber = 1
 let firstField, lastField
@@ -10,61 +11,20 @@ let moveNumber = 0
 let startSelected = false
 let gameOver = false
 let rememberPreviousPoint
-let snake, moves
 
 // startId indicates where the game started from
 // endId indicates which last field was selected
 let start, end
 
 
-let connection = new signalR.HubConnectionBuilder()
-	.withUrl('/hubs')
-	.configureLogging(signalR.LogLevel.Warning)
-	.build()
-
-const snakeGameId = parseInt(localStorage.getItem('SnakeId'))
-
-if (snakeGameId) {
-	await connection
-		.start()
-		.then(async function () {
-			snake = await connection.invoke('getSnake', snakeGameId)
-			moves = await connection.invoke('Simulation', snakeGameId)
-		})
-		.catch(function (err) {
-			console.error(err.toString())
-		})
-		.finally(async () => {
-			if (connection._connectionState === signalR.HubConnectionState.Connected) {
-				await connection.stop()
-			}
-		})
-
-	if (snake) {
-		snake = JSON.parse(snake)
-		moves = JSON.parse(moves)
-
-		moveNumber = moves.length
-		gameOver = snake.GameOver
-
-		if (snake.Start < 10) {
-			start = 'dot0' + snake.Start
-
-		} else {
-			start = 'dot' + snake.Start
-		}
-
-		if (snake.Start < 10) {
-			end = 'dot0' + snake.End
-
-		} else {
-			end = 'dot' + snake.End
-		}
-		
-		if (gameOver) {
-			alert(`Игра завершена победой игрока ${snake.Winner}. Нажмите на кнопку сбросить чтобы начать сначала.`)
-		}
-	}
+if (localStorage.getItem('SnakeId')) {
+	getDataForDot().then(value => {
+		start = value.start
+		end = value.end
+		moveNumber = value.moveNumber
+		gameOver = value.gameOver
+		playerNumber = value.playerNumber
+	})
 }
 
 
