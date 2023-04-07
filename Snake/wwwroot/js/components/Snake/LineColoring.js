@@ -1,6 +1,6 @@
-﻿function lineColoring (element1, element2, userNumber) {
-    const [number1] = element1.id.match(/\d+/)
-    const [number2] = element2.id.match(/\d+/)
+﻿function lineColoring(firstField, lastField, userNumber) {
+    const [number1] = firstField.id.match(/\d+/)
+    const [number2] = lastField.id.match(/\d+/)
 
     const arrNumbers1 = number1.split("").map(digit => parseInt(digit));
     const arrNumbers2 = number2.split("").map(digit => parseInt(digit));

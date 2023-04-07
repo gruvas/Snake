@@ -25,6 +25,23 @@ namespace Snake.Hubs
             return int.Parse(snakeId);
         }
 
+        public async Task<dynamic> GetSnake(int id)
+        {
+            var httpClient = new HttpClient();
+
+            var snake = new SnakeGame
+            {
+                Id = id
+            };
+
+            dynamic response = await httpClient.PostAsJsonAsync((addressServer + "/getSnake"), snake);
+            response.EnsureSuccessStatusCode();
+
+            dynamic responseContent = await response.Content.ReadAsStringAsync();
+
+            return responseContent;
+        }
+
         public async Task<bool> CheckSnakeExists(int snakeGameId)
         {
             var httpClient = new HttpClient();
@@ -42,7 +59,6 @@ namespace Snake.Hubs
 
             return responseBool;
         }
-
        
         public async Task<Task> AddMove(int snakeGameId, int playerNumber, int firstField, int lastField, int moveNumber)
         {
@@ -61,7 +77,6 @@ namespace Snake.Hubs
 
             return Task.CompletedTask;
         }
-
 
         public async Task<bool> FieldValidation(int snakeGameId, int lastField)
         {
@@ -140,6 +155,23 @@ namespace Snake.Hubs
             await httpClient.PostAsJsonAsync((addressServer + "/removeSnake"), snake);
 
             return Task.CompletedTask;
+        }
+        
+        public async Task<dynamic> Simulation(int id)
+        {
+            var httpClient = new HttpClient();
+
+            var snake = new SnakeGame
+            {
+                Id = id
+            };
+
+            dynamic response = await httpClient.PostAsJsonAsync((addressServer + "/simulation"), snake);
+            response.EnsureSuccessStatusCode();
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            return responseContent;
         }
     }
 }

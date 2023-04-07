@@ -5,6 +5,7 @@ using Snake.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,6 +27,18 @@ namespace Snake.DAL.Repositories
             {
                 string insertQuery = $"INSERT INTO public.snake_game DEFAULT VALUES RETURNING \"Id\"";
                 return db.QueryFirstOrDefault<int>(insertQuery);
+            }
+        }
+
+        public dynamic GetSnake(int id)
+        {
+            using (IDbConnection db = new NpgsqlConnection(connectionString))
+            {
+                string query = @"SELECT * FROM public.snake_game
+                         WHERE ""Id"" = @id";
+                var result = db.Query<dynamic>(query, new { id }).FirstOrDefault();
+
+                return result;
             }
         }
 
@@ -114,6 +127,18 @@ namespace Snake.DAL.Repositories
                 string deleteQuery = $"DELETE FROM public.snake_game " +
                     $"WHERE \"Id\" = @id";
                 db.Execute(deleteQuery, new { id });
+            }
+        }
+
+        public dynamic Simulation(int id)
+        {
+            using (IDbConnection db = new NpgsqlConnection(connectionString))
+            {
+                string query = @"SELECT * FROM public.moves
+                         WHERE ""SnakeGameId"" = @id";
+                var result = db.Query<dynamic>(query, new { id }).ToList();
+
+                return result;
             }
         }
     }

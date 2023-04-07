@@ -37,9 +37,7 @@
 			console.error(err.toString())
 		})
 		.finally(async () => {
-			if (
-				connection._connectionState === signalR.HubConnectionState.Connected
-			) {
+			if (connection._connectionState === signalR.HubConnectionState.Connected) {
 				await connection.stop()
 			}
 		})

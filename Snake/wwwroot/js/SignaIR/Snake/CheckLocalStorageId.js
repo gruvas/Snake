@@ -1,4 +1,4 @@
-﻿async function checkLlocalStorageId() {
+﻿async function checkLocalStorageId() {
     let connection = new signalR.HubConnectionBuilder()
         .withUrl('/hubs')
         .configureLogging(signalR.LogLevel.Warning)
@@ -40,4 +40,4 @@
     }
 }
 
-export default checkLlocalStorageId
+export default checkLocalStorageId

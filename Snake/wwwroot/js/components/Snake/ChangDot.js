@@ -5,7 +5,8 @@ async function changDot(
 	firstField,
 	playerNumber,
 	moveNumber,
-	start
+	start,
+	simulation = false
 ) {
 	const gameTitle = document.querySelector('.game-title')
 
@@ -18,7 +19,9 @@ async function changDot(
 			start = firstField.id
 			firstField.setAttribute('src', '/img/dot_green.svg')
 
-			changeStartEnd(firstField, 'ChangeStart')
+			if (!simulation) {
+				changeStartEnd(firstField, 'ChangeStart')
+			}
 		}
 
 		playerNumber = 2

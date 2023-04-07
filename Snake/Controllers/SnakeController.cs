@@ -27,7 +27,20 @@ namespace Snake.Controllers
 
             return Ok(newSnakeId);
         }
-        
+
+        [HttpPost("getSnake")]
+        public IActionResult GetSnake([FromBody] SnakeGame snakeGame)
+        {
+            string snakeJson = JsonSerializer.Serialize(snakeGame);
+            SnakeGame parsedSnake = JsonSerializer.Deserialize<SnakeGame>(snakeJson);
+
+            int id = parsedSnake.Id;
+
+            dynamic result = _snakeRepository.GetSnake(id);
+
+            return Ok(result);
+        }
+
         [HttpPost("checkSnakeExists")]
         public IActionResult CheckSnakeExists([FromBody] SnakeGame snakeGameId)
         {
@@ -125,6 +138,19 @@ namespace Snake.Controllers
             _snakeRepository.RemoveSnake(id);
 
             return Ok();
+        }
+
+        [HttpPost("simulation")]
+        public IActionResult Simulation([FromBody] SnakeGame snakeGame)
+        {
+            string snakeJson = JsonSerializer.Serialize(snakeGame);
+            SnakeGame parsedSnake = JsonSerializer.Deserialize<SnakeGame>(snakeJson);
+
+            int id = parsedSnake.Id;
+
+            dynamic result = _snakeRepository.Simulation(id);
+
+            return Ok(result);
         }
     }
 }
