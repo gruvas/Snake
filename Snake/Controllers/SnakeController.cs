@@ -8,10 +8,6 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace Snake.Controllers
 {
-    internal class MyData
-    {
-        public string test { get; set; }
-    }
     public class SnakeController : Controller
     {
         private readonly ISnakeRepository _snakeRepository;

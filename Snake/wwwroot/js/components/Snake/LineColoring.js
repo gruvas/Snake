@@ -26,7 +26,7 @@
 
 function painting(number, userNumber, type) {
     if (type == "horizontal") {
-        const line = document.getElementById(`line-horizontal${number}`)
+        const line = document.querySelector(`#line-horizontal${number}`)
 
         if (userNumber == 1) {
             line.style.backgroundColor = "#34c924";
@@ -34,7 +34,7 @@ function painting(number, userNumber, type) {
             line.style.backgroundColor = "#42aaff";
         }
     } else {
-        const line = document.getElementById(`line-vertical${number}`)
+        const line = document.querySelector(`#line-vertical${number}`)
 
         if (userNumber == 1) {
             line.style.backgroundColor = "#34c924";

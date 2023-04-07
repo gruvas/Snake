@@ -1,5 +1,7 @@
-﻿import lineColoring from '/js/components/LineColoring.js'
-import createSnake from '/js/components/createSnake.js'
+﻿import lineColoring from '/js/components/Snake/LineColoring.js'
+import createSnake from '/js/components/Snake/createSnake.js'
+import checkLlocalStorageId from '/js/SignaIR/CheckLlocalStorageId.js'
+import fieldValidation from '/js/SignaIR/FieldValidation.js'
 
 const dots = document.querySelectorAll('.dot');
 const gameTitle = document.querySelector('.game-title');
@@ -10,6 +12,7 @@ let moveNumber = 0
 let startSelected = false
 let gameOver = false
 let wrongFieldsSelected = false
+let rememberPreviousPoint
 
 // startId indicates where the game started from
 // endId indicates which last field was selected
@@ -19,38 +22,12 @@ let start, end
 
 let connection = new signalR.HubConnectionBuilder()
     .withUrl("/hubs")
-    .configureLogging(signalR.LogLevel.Information)
+    .configureLogging(signalR.LogLevel.Warning)
     .build();
 
-if (localStorage.getItem('SnakeId')) {
-    await connection.start().then(async function () {
-        const found = await connection.invoke("CheckSnakeExists", parseInt(localStorage.getItem('SnakeId')));
 
-        if (!found) {
-            localStorage.removeItem('SnakeId');
-            return;
-        }
-    }).catch(function (err) {
-        console.error(err.toString());
-    }).finally(async () => {
-        if (connection._connectionState === signalR.HubConnectionState.Connected) {
-            await connection.stop()
-        }
-    })
-}
+checkLlocalStorageId()
 
-if (!localStorage.getItem('SnakeId')) {
-    await connection.start().then(async function () {
-        const snakeId = await connection.invoke("CreateSnake");
-        localStorage.setItem('SnakeId', snakeId);
-    }).catch(function (err) {
-        console.error(err.toString());
-    }).finally(async () => {
-        if (connection._connectionState === signalR.HubConnectionState.Connected) {
-            await connection.stop()
-        }
-    })
-}
 
 
 dots.forEach(dot => {
@@ -74,53 +51,22 @@ dots.forEach(dot => {
 
             firstField = this
 
+            rememberPreviousPoint = this.getAttribute('src')
             this.setAttribute('src', "/img/dot_red.svg")
         } else {
             const id = this.id;
             lastField = this
 
             if (firstField == lastField) {
-                lastField.setAttribute('src', "/img/dot.svg")
+                lastField.setAttribute('src', rememberPreviousPoint)
                 firstField = undefined
                 lastField = undefined
                 return;
             }
 
 
+            fieldValidation(lastField, playerNumber).then(value => gameOver = value)
 
-            await connection.start().then(async function () {
-                const snakeGameId = parseInt(localStorage.getItem('SnakeId'));
-                let [lastFd] = lastField.id.match(/\d+/)
-                lastFd = parseInt(lastFd)
-
-                let valid = await connection.invoke("FieldValidation", snakeGameId, lastFd);
-                gameOver = !valid
-
-                if (gameOver) {
-                    let winner
-
-                    if (playerNumber == 1) {
-                        winner = 2
-                    } else {
-                        winner = 1
-                    }
-
-                    await connection.invoke("EndGame", snakeGameId, winner);
-
-                    alert(`Победу одержал ${winner} игрок`)
-                    gameTitle.textContent = `Победу одержал ${winner} игрок`
-                }
-
-
-                return false
-
-            }).catch(function (err) {
-                console.error(err.toString());
-            }).finally(async () => {
-                if (connection._connectionState === signalR.HubConnectionState.Connected) {
-                    await connection.stop()
-                }
-            })
 
 
             let [firstFd] = firstField.id.match(/\d+/)
