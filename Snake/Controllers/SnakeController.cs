@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Snake.DAL.Interface;
 using Snake.Domain.Models;
-using Snake.Models;
-using System.Diagnostics;
 using System.Text.Json;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Snake.Controllers
 {
@@ -22,7 +19,6 @@ namespace Snake.Controllers
         {
             return View();
         }
-
         
         [HttpPost("createSnake")]
         public IActionResult CreateSnake()
@@ -31,7 +27,6 @@ namespace Snake.Controllers
 
             return Ok(newSnakeId);
         }
-
         
         [HttpPost("checkSnakeExists")]
         public IActionResult CheckSnakeExists([FromBody] SnakeGame snakeGameId)
@@ -45,7 +40,6 @@ namespace Snake.Controllers
 
             return Ok(newSnakeId);
         }
-        
 
         [HttpPost("addMove")]
         public IActionResult AddMove([FromBody] Move move)

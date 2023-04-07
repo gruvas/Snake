@@ -1,10 +1,4 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System;
-using System.Net;
-using System.Text;
-using System.Xml.Linq;
-using static System.Net.Mime.MediaTypeNames;
 using Snake.Domain.Models;
 
 namespace Snake.Hubs
