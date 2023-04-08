@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace Snake.Domain.Models
+﻿namespace Snake.Domain.Models
 {
     public class SnakeGame
     {

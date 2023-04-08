@@ -1,14 +1,7 @@
 ﻿using Dapper;
 using Npgsql;
 using Snake.DAL.Interface;
-using Snake.Domain.Models;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Dynamic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Snake.DAL.Repositories
 {

@@ -1,14 +1,12 @@
-using Snake.PostgresMigrate;
-using Snake.DAL.Repositories;
 using Snake.DAL.Interface;
-using Microsoft.AspNetCore.SignalR;
+using Snake.DAL.Repositories;
 using Snake.Hubs;
+using Snake.PostgresMigrate;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
 
 string connectionString = builder.Configuration["ConnectionString:NpgsqlConnectionString"];
 PostgresMigrator.Migrate(connectionString);

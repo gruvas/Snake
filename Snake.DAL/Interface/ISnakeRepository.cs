@@ -1,11 +1,4 @@
-﻿using Snake.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Snake.DAL.Interface
+﻿namespace Snake.DAL.Interface
 {
     public interface ISnakeRepository
     {

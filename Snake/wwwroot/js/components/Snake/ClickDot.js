@@ -10,7 +10,7 @@ let firstField, lastField
 let moveNumber = 0
 let startSelected = false
 let gameOver = false
-let rememberPreviousPoint
+let rememberPreviousDot
 
 // startId indicates where the game started from
 // endId indicates which last field was selected
@@ -48,13 +48,13 @@ async function clickDot() {
 
 		firstField = this
 
-		rememberPreviousPoint = this.getAttribute('src')
+		rememberPreviousDot = this.getAttribute('src')
 		this.setAttribute('src', '/img/dot_red.svg')
 	} else {
 		lastField = this
 
 		if (firstField == lastField) {
-			lastField.setAttribute('src', rememberPreviousPoint)
+			lastField.setAttribute('src', rememberPreviousDot)
 			firstField = undefined
 			lastField = undefined
 			return
@@ -79,7 +79,6 @@ async function clickDot() {
 			changeStartEnd(lastField, 'ChangeStart')
 		} else {
 			end = lastField.id
-
 			changeStartEnd(lastField, 'ChangeEnd')
 		}
 
