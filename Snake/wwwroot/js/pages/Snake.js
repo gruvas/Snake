@@ -22,10 +22,8 @@ document.querySelector('#reset').addEventListener('click', async function () {
     removeSnake()
 
 	if (connection._connectionState === signalR.HubConnectionState.Connected) {
-		// Если соединение уже установлено, вызываем функцию непосредственно
 		await connection.invoke('SendNotification', "Другой игрок обновил игру");
 	} else {
-		// Если соединение еще не установлено, вызываем start() и затем invoke() после успешного установления
 		await connection.start().then(async () => {
 			await connection.invoke('SendNotification', "Другой игрок обновил игру");
 		}).catch((error) => {
@@ -34,19 +32,28 @@ document.querySelector('#reset').addEventListener('click', async function () {
 	}
 })
 
+
 receivingMessages()
 
 async function receivingMessages() {
 
-    connection.on("ReceiveNotification", function (message) {
+	connection.on("ReceiveNotification", function (message) {
+		let numbers = message.match(/\d+/g);
+		let letters = message.match(/[^\d\s]+/g);
+
+		letters = letters.join(" ")
+
 		if (message == 'Другой игрок сделал ход') {
             simulation()
 		}
 
 		if (message == 'Другой игрок обновил игру') {
-			alert('Другой игрок обновил игру')
-
 			removeSnake()
+			alert('Другой игрок обновил игру')
+		}
+
+		if (letters == 'Созадна новая игра') {
+			localStorage.setItem('SnakeId', numbers[0])
 		}
     });
 

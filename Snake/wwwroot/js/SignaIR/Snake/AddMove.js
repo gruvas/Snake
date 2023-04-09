@@ -40,10 +40,8 @@
 
 
 	if (connectionNotification._connectionState === signalR.HubConnectionState.Connected) {
-		// Если соединение уже установлено, вызываем функцию непосредственно
 		await connectionNotification.invoke('SendNotification', "Другой игрок сделал ход");
 	} else {
-		// Если соединение еще не установлено, вызываем start() и затем invoke() после успешного установления
 		await connectionNotification.start().then(async () => {
 			await connectionNotification.invoke('SendNotification', "Другой игрок сделал ход");
 		}).catch((error) => {
