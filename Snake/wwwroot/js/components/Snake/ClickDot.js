@@ -1,5 +1,6 @@
 ﻿import changDot from '/js/components/Snake/changDot.js'
 import lineColoring from '/js/components/Snake/LineColoring.js'
+import lastFieldCheck from '/js/components/Snake/LastFieldCheck.js'
 import addMove from '/js/SignaIR/Snake/db/AddMove.js'
 import changeStartEnd from '/js/SignaIR/Snake/db/ChangeStartEnd.js'
 import fieldValidation from '/js/SignaIR/Snake/db/FieldValidation.js'
@@ -75,6 +76,19 @@ async function clickDot() {
 		this.setAttribute('src', '/img/dot_red.svg')
 	} else {
 		lastField = this
+
+		let validationLastFieldVariable = lastFieldCheck(firstField, lastField)
+
+
+		if (!validationLastFieldVariable) {
+			alert('Необходимо выбирать ближайшие точки')
+			firstField.setAttribute('src', rememberPreviousDot)
+			lastField.setAttribute('src', '/img/dot.svg')
+			firstField = undefined
+			lastField = undefined
+			return
+		}
+
 
 		if (firstField == lastField) {
 			lastField.setAttribute('src', rememberPreviousDot)
