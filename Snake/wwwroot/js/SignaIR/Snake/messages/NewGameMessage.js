@@ -1,4 +1,4 @@
-﻿async function newGameAnnouncement(snakeId) {
+﻿async function newGameMessage(snakeId) {
     let connection = new signalR.HubConnectionBuilder()
         .withUrl("/notification")
         .configureLogging(signalR.LogLevel.Warning)
@@ -15,4 +15,4 @@
     }
 }
 
-export default newGameAnnouncement
+export default newGameMessage

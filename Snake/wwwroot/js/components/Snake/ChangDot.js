@@ -1,4 +1,4 @@
-﻿import changeStartEnd from '/js/SignaIR/Snake/ChangeStartEnd.js'
+﻿import changeStartEnd from '/js/SignaIR/Snake/db/ChangeStartEnd.js'
 
 async function changDot(
 	lastField,

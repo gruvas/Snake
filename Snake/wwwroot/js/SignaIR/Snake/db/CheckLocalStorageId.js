@@ -1,4 +1,4 @@
-﻿import newGameAnnouncement from '/js/SignaIR/Snake/NewGameAnnouncement.js'
+﻿import newGameMessage from '/js/SignaIR/Snake/messages/NewGameMessage.js'
 
 async function checkLocalStorageId() {
     let connection = new signalR.HubConnectionBuilder()
@@ -32,7 +32,7 @@ async function checkLocalStorageId() {
                 const snakeId = await connection.invoke('CreateSnake')
                 localStorage.setItem('SnakeId', snakeId)
 
-                newGameAnnouncement(snakeId)
+                newGameMessage(snakeId)
             })
             .catch(function (err) {
                 console.error(err.toString())

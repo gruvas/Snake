@@ -1,14 +1,10 @@
-﻿async function addMove(playerNumber, firstField, lastField, moveNumber) {
+﻿import moveMessage from '/js/SignaIR/Snake/messages/MoveMessage.js'
+
+async function addMove(playerNumber, firstField, lastField, moveNumber) {
 	let connection = new signalR.HubConnectionBuilder()
 		.withUrl('/hubs')
 		.configureLogging(signalR.LogLevel.Warning)
 		.build()
-
-	let connectionNotification = new signalR.HubConnectionBuilder()
-		.withUrl("/notification")
-		.configureLogging(signalR.LogLevel.Warning)
-		.build();
-
 
 	const snakeGameId = parseInt(localStorage.getItem('SnakeId'))
 
@@ -39,15 +35,7 @@
 		})
 
 
-	if (connectionNotification._connectionState === signalR.HubConnectionState.Connected) {
-		await connectionNotification.invoke('SendNotification', "Другой игрок сделал ход");
-	} else {
-		await connectionNotification.start().then(async () => {
-			await connectionNotification.invoke('SendNotification', "Другой игрок сделал ход");
-		}).catch((error) => {
-			console.error(error);
-		});
-	}
+	moveMessage()
 }
 
 export default addMove
