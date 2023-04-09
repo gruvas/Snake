@@ -29,7 +29,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.MapHub<NotificationHub>("/hubs");
+app.MapHub<RequestHub>("/hubs");
 
 app.MapControllers();
 

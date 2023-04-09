@@ -3,7 +3,7 @@ using Snake.Domain.Models;
 
 namespace Snake.Hubs
 {
-    public class NotificationHub : Hub
+    public class RequestHub : Hub
     {
          // Address of the server on which the application is running
         string addressServer = "https://localhost:44349";
