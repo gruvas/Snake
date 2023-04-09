@@ -27,6 +27,32 @@ if (localStorage.getItem('SnakeId')) {
 	})
 }
 
+let connection = new signalR.HubConnectionBuilder()
+	.withUrl("/notification")
+	.configureLogging(signalR.LogLevel.Warning)
+	.build();
+
+receivingMessages()
+
+
+async function receivingMessages() {
+
+	connection.on("ReceiveNotification", function (message) {
+		if (message == 'Другой игрок сделал ход') {
+			getDataForDot().then(value => {
+				start = value.start
+				end = value.end
+				moveNumber = value.moveNumber
+				gameOver = value.gameOver
+				playerNumber = value.playerNumber
+			})
+		}
+	});
+
+	await connection.start();
+}
+
+
 
 async function clickDot() {
 	if (gameOver) {

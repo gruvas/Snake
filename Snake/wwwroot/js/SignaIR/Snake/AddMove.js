@@ -4,6 +4,12 @@
 		.configureLogging(signalR.LogLevel.Warning)
 		.build()
 
+	let connectionNotification = new signalR.HubConnectionBuilder()
+		.withUrl("/notification")
+		.configureLogging(signalR.LogLevel.Warning)
+		.build();
+
+
 	const snakeGameId = parseInt(localStorage.getItem('SnakeId'))
 
 	let [firstFd] = firstField.id.match(/\d+/)
@@ -31,6 +37,19 @@
 				await connection.stop()
 			}
 		})
+
+
+	if (connectionNotification._connectionState === signalR.HubConnectionState.Connected) {
+		// Если соединение уже установлено, вызываем функцию непосредственно
+		await connectionNotification.invoke('SendNotification', "Другой игрок сделал ход");
+	} else {
+		// Если соединение еще не установлено, вызываем start() и затем invoke() после успешного установления
+		await connectionNotification.start().then(async () => {
+			await connectionNotification.invoke('SendNotification', "Другой игрок сделал ход");
+		}).catch((error) => {
+			console.error(error);
+		});
+	}
 }
 
 export default addMove
