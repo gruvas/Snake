@@ -5,13 +5,8 @@ namespace Snake.Hubs
 {
     public class NotificationHub : Hub
     {
-        private static Dictionary<string, string> _connections = new Dictionary<string, string>();
-        private static Dictionary<string, string> _snakeIds = new Dictionary<string, string>();
-        private static List<string> _snakeIdsQueue = new List<string>();
-
-        // Address of the server on which the application is running
+         // Address of the server on which the application is running
         string addressServer = "https://localhost:44349";
-
 
         public async Task<int> CreateSnake()
         {
