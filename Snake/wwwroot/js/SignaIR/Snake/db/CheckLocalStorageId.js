@@ -1,9 +1,11 @@
-﻿async function checkLocalStorageId() {
+﻿import newGameMessage from '/js/SignaIR/Snake/messages/NewGameMessage.js'
+
+async function checkLocalStorageId() {
     let connection = new signalR.HubConnectionBuilder()
         .withUrl('/hubs')
         .configureLogging(signalR.LogLevel.Warning)
         .build()
-
+          
     if (localStorage.getItem('SnakeId')) {
         await connection
             .start()
@@ -14,7 +16,7 @@
                 )
 
                 if (!found) {
-                    const snakeId = await connection.invoke('CreateSnake')
+                    constsnakeId = await connection.invoke('CreateSnake')
                     localStorage.setItem('SnakeId', snakeId)
                 }
             })
@@ -29,6 +31,8 @@
             .then(async function () {
                 const snakeId = await connection.invoke('CreateSnake')
                 localStorage.setItem('SnakeId', snakeId)
+
+                newGameMessage(snakeId)
             })
             .catch(function (err) {
                 console.error(err.toString())

@@ -1,4 +1,6 @@
-﻿async function addMove(playerNumber, firstField, lastField, moveNumber) {
+﻿import moveMessage from '/js/SignaIR/Snake/messages/MoveMessage.js'
+
+async function addMove(playerNumber, firstField, lastField, moveNumber) {
 	let connection = new signalR.HubConnectionBuilder()
 		.withUrl('/hubs')
 		.configureLogging(signalR.LogLevel.Warning)
@@ -31,6 +33,9 @@
 				await connection.stop()
 			}
 		})
+
+
+	moveMessage()
 }
 
 export default addMove

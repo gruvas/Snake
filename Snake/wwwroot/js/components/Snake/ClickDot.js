@@ -1,9 +1,10 @@
 ﻿import changDot from '/js/components/Snake/changDot.js'
 import lineColoring from '/js/components/Snake/LineColoring.js'
-import addMove from '/js/SignaIR/Snake/AddMove.js'
-import changeStartEnd from '/js/SignaIR/Snake/ChangeStartEnd.js'
-import fieldValidation from '/js/SignaIR/Snake/FieldValidation.js'
-import getDataForDot from '/js/SignaIR/Snake/getDataForDot.js'
+import lastFieldCheck from '/js/components/Snake/LastFieldCheck.js'
+import addMove from '/js/SignaIR/Snake/db/AddMove.js'
+import changeStartEnd from '/js/SignaIR/Snake/db/ChangeStartEnd.js'
+import fieldValidation from '/js/SignaIR/Snake/db/FieldValidation.js'
+import getDataForDot from '/js/SignaIR/Snake/db/getDataForDot.js'
 
 let playerNumber = 1
 let firstField, lastField
@@ -16,6 +17,11 @@ let rememberPreviousDot
 // endId indicates which last field was selected
 let start, end
 
+let connection = new signalR.HubConnectionBuilder()
+	.withUrl("/notification")
+	.configureLogging(signalR.LogLevel.Warning)
+	.build();
+
 
 if (localStorage.getItem('SnakeId')) {
 	getDataForDot().then(value => {
@@ -26,6 +32,24 @@ if (localStorage.getItem('SnakeId')) {
 		playerNumber = value.playerNumber
 	})
 }
+
+async function receivingMessages() {
+	connection.on("ReceiveNotification", function (message) {
+		if (message == 'Другой игрок сделал ход') {
+			getDataForDot().then(value => {
+				start = value.start
+				end = value.end
+				moveNumber = value.moveNumber
+				gameOver = value.gameOver
+				playerNumber = value.playerNumber
+			})
+		}
+	});
+
+	await connection.start();
+}
+
+receivingMessages()
 
 
 async function clickDot() {
@@ -52,6 +76,19 @@ async function clickDot() {
 		this.setAttribute('src', '/img/dot_red.svg')
 	} else {
 		lastField = this
+
+		let validationLastFieldVariable = lastFieldCheck(firstField, lastField)
+
+
+		if (!validationLastFieldVariable) {
+			alert('Необходимо выбирать ближайшие точки')
+			firstField.setAttribute('src', rememberPreviousDot)
+			lastField.setAttribute('src', '/img/dot.svg')
+			firstField = undefined
+			lastField = undefined
+			return
+		}
+
 
 		if (firstField == lastField) {
 			lastField.setAttribute('src', rememberPreviousDot)
